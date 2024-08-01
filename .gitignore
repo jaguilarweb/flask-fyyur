@@ -18,3 +18,4 @@ htmlcov/
 docs/_build/%
 .DS_Store
 migrations/*
+recursos/
