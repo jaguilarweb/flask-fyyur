@@ -115,7 +115,18 @@ Finalmente, aplicamos el siguiente comando:
 
   ```bash
   flask db init
+  # Al dejar las migraciones fuera del archivo src
+  flask --app src/app db init
   ```
 
+Nota:
 Una forma de continuar alternativa, sería seguir trabajando con la información fake.
 Dado que la aplicación se encuentra funcional, avanzar con las rutas y funcionalidades. Una vez obtenida la funcionalidad deseada, avanzar en la persistencia de los datos.
+
+Ahora corremos la migración para detectar los cambios en los modelos y upgrade para reflejarlos en la base de datos:
+
+  ```bash
+  # Al dejar las migraciones fuera del archivo src
+  flask --app src/app db migrate -m "Agregar un mensaje si se desea"
+  flask --app src/app db upgrade
+  ```
