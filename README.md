@@ -13,9 +13,29 @@ This app is nearly complete. It is only missing one thing… real data! While th
 
 We want Fyyur to be the next new platform that artists and musical venues can use to find each other, and discover new music shows. Let's make that happen!
 
-Home page:
-![imagen](/recursos/home-page.png)
+**Home page**:
 
+To local:
+![imagen](/resources/home-page.png)
+
+To github:
+![imagen](https://github.com/jaguilarweb/flask-fyyur/blob/master/resources/home-page.png)
+
+**Entity Relationship Diagram**:
+
+To local:
+![imagen](/resources/entidad_relacion.png)
+
+To github:
+![imagen](https://github.com/jaguilarweb/flask-fyyur/blob/master/resources/entidad_relacion.png)
+
+**Physical data model**:
+
+To local:
+![imagen](/resources/modelo_fisico_datos.png)
+
+To github:
+![imagen](https://github.com/jaguilarweb/flask-fyyur/blob/master/resources/modelo_fisico_datos.png)
 
 ## Disclaimer
 

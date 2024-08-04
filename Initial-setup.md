@@ -88,3 +88,34 @@ python3 src/app.py
 ```
 
 Ya se puede acceder a la aplicación desde la url `http://localhost:5000/`
+
+#############################
+Continuación del desarrollo
+#############################
+
+## Modelos Base de datos
+//TODO:
+Revisar que los modelos de las tablas se correspondan con la estructura deseada.
+Revisar con forms.py que tiene la estructura de datos (crear una tabla)
+
+
+Instalación de Flask-Migrate
+
+```bash
+pip3 install Flask-Migrate
+```
+
+Antes de crear la migración:
+
+- creamos la carpeta `migrations`
+- importamos en app.py `from flask_migrate import Migrate`
+- agregamos a app.py `migrate = Migrate(app,db)`
+
+Finalmente, aplicamos el siguiente comando:
+
+  ```bash
+  flask db init
+  ```
+
+Una forma de continuar alternativa, sería seguir trabajando con la información fake.
+Dado que la aplicación se encuentra funcional, avanzar con las rutas y funcionalidades. Una vez obtenida la funcionalidad deseada, avanzar en la persistencia de los datos.
