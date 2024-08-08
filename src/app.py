@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
+from datetime import datetime
 from flask_wtf import Form
 from forms import *
 #----------------------------------------------------------------------------#
@@ -22,11 +23,22 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-# TODO: connect to a local postgresql database
+# (CHECK) TODO: connect to a local postgresql database 
 migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+
+class Show(db.Model):
+    __tablename__ = 'show'
+
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), primary_key=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), primary_key=True)
+    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, primary_key=True)
+    venue_child = db.relationship("Venue", back_populates="artists") 
+    artist_parent = db.relationship("Artist", back_populates="venues") 
+    # (CHECK) TODO: implement any missing fields, as a database migration using Flask-Migrate
+
 
 class Venue(db.Model):
     __tablename__ = 'venue'
@@ -43,9 +55,10 @@ class Venue(db.Model):
     website_link = db.Column(db.String(120), nullable=True)
     seeking_talent = db.Column(db.Boolean, nullable=True)
     seeking_description = db.Column(db.String(120), nullable=True)
+    artists = db.relationship("Show", back_populates="venue_child")
 
     # Implement all nullable as True just for develop convenience (change to false at the end)
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    # (CHECK) TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -61,8 +74,8 @@ class Artist(db.Model):
     website_link = db.Column(db.String(120), nullable=True)
     seeking_venue = db.Column(db.Boolean, nullable=True)
     seeking_description = db.Column(db.String(120), nullable=True)
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    venues = db.relationship("Show", back_populates="artist_parent")
+    # (CHECK) TODO: implement any missing fields, as a database migration using Flask-Migrate 
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 

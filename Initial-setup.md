@@ -130,3 +130,32 @@ Ahora corremos la migración para detectar los cambios en los modelos y upgrade 
   flask --app src/app db migrate -m "Agregar un mensaje si se desea"
   flask --app src/app db upgrade
   ```
+
+Nota:
+
+La relación muchos a muchos utilizada tiene por referencia la siguiente documentación:
+[REF](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#many-to-many)
+
+Título: Association Object¶
+
+```python
+class Association(Base):
+    __tablename__ = "association_table"
+    left_id = Column(ForeignKey("left_table.id"), primary_key=True)
+    right_id = Column(ForeignKey("right_table.id"), primary_key=True)
+    extra_data = Column(String(50))
+    child = relationship("Child", back_populates="parents")
+    parent = relationship("Parent", back_populates="children")
+
+
+class Parent(Base):
+    __tablename__ = "left_table"
+    id = Column(Integer, primary_key=True)
+    children = relationship("Association", back_populates="parent")
+
+
+class Child(Base):
+    __tablename__ = "right_table"
+    id = Column(Integer, primary_key=True)
+    parents = relationship("Association", back_populates="child")
+  ```
