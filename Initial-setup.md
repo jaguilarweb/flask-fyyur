@@ -159,3 +159,32 @@ class Child(Base):
     id = Column(Integer, primary_key=True)
     parents = relationship("Association", back_populates="child")
   ```
+
+## Formularios
+
+El desarrollo lo continuamos en app.py, pasando los datos fake a datos provenientes de la base de datos.
+
+Para lo anterior, vamos a partir por la creación de los venue (eventos).
+El flujo de los datos es:
+
+1. Crear un formulario para la creación de un venue.
+2. Crear una ruta para la creación de un venue.
+3. Crear una ruta para la visualización de los venues creados.
+
+## Flujos de datos explicados
+
+### Crear Venues
+Homepage -> button 'Post a venue'
+
+Homepage corresponde a la página de template en html.
+El botón 'Post venue' tiene el link a la ruta '/venue/create', por tanto, al hacerle click hace una petición GET al servidor (app.py).
+En la ruta '/venue/create' encontramos dos route accesibles, uno por el metodo GET y el segundo por el método POST.
+En este caso, al hacer la petición GET ingresamos a la función 'create_venue_form()' que crea un objeto de tipo formulario. Este modelo de dato fue importado desde el archivo 'form.py' en el cual creamos 3 tipos de formularios (ShowForm(), VenueForm() y ArtistForm()).
+El formulario creado es enviado por parámetro a la plantilla 'forms/new_venue.html' que es renderizada en el navegador `return render_template('forms/new_venue.html', form=form)`.
+En la plantilla 'new_venue.html' se renderiza el formulario, el cual recolecta todos los datos de los distintos campos que le fueron creados en forms.py y que ahora están accesibles en la plantilla html.
+El formulario, tiene la siguiente configuración: `<form method="post" class="form" action="/venues/create">`; por tanto, al hacer click en el botón 'Submit' se envía una petición POST al servidor, la cual es recibida por la función 'create_venue_submission()'.
+En esta función se valida el formulario y se obtienen los datos de cada uno de los campos del formulario mediante un `request.form.get('name')`para los campos de string y `request.form.getlist('genders')` para los array.
+Una vez guardado cada valor de los campos en una respectiva variable, se usan estas para crear una nueva instancia del objeto 'venue', la que luego se envía a la base de datos en un bloque try catch. Si la instrucción genera un error, se ingresará en el bloque catch, generandose el rollback para que no se guarden los datos a la base de datos, la variable 'error' tomara un valor 'True' y se enviarán los errores. Si la instrucción estuvo correcta, se guardarán los datos en la base de datos y se renderizará la página home junto a un mensaje flash de éxito.
+
+Actualizar la referencia a los flashing:
+[Simple Flashing](https://flask.palletsprojects.com/en/3.0.x/patterns/flashing/#simple-flashing)
