@@ -1,8 +1,8 @@
 __pycache__/
 *.py[cod]
-*.jpg
-*.png
-*.gif
+src/static/img/*.jpg
+src/static/img/*.png
+src/static/img/*.gif
 *.cpython
 migrations/
 
