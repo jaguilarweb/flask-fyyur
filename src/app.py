@@ -108,29 +108,40 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  # (Check) TODO: replace with real venues data.
+  #      TODO: num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  error = False
+  num_upcoming_shows = 0
+  data=[]
+
+  try:
+    # Venues by city
+    areas=db.session.query(Venue).distinct(Venue.city).all()
+    # All venues
+    venues=db.session.query(Venue).all()
+  except():
+    error = True
+    db.session.rollback()
+  finally:
+    db.session.close()
+  if error:
+    flash('An error occurred. Venues could not be listed.')
+    print(sys.exc_info())
+  else:
+    flash('Venues has been successfully listed!')
+    for area in areas:
+      data.append({
+        "city": area.city,
+        "state": area.state,
+        "venues": [
+          {
+            "id": venue.id,
+            "name": venue.name,
+            "num_upcoming_shows": num_upcoming_shows
+          } for venue in venues if venue.city == area.city
+        ]
+      })
+
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
@@ -242,7 +253,7 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
+  #(Check) TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
   error = False
   name = request.form.get('name')

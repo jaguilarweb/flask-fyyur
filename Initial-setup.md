@@ -188,3 +188,98 @@ Una vez guardado cada valor de los campos en una respectiva variable, se usan es
 
 Actualizar la referencia a los flashing:
 [Simple Flashing](https://flask.palletsprojects.com/en/3.0.x/patterns/flashing/#simple-flashing)
+
+
+#### Queries
+
+
+Flask-SQLAlchemy en su version 3.1 considera que la interfaz de consultas que utiliza la siguiente forma ya está deprecada (legacy):
+[Legacy Query](https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/legacy-query/)
+  
+```python
+venues = Venue.query.all()
+```
+
+En dicha versión considera que es preferible el uso de la siguiente expresión:
+  
+  ```python
+  venues = db.session.query(Venue).all()
+  ```
+
+Referencia para buscar las posibles consultas:
+[SQLAlchemy Query API](https://docs.sqlalchemy.org/en/14/orm/query.html)
+
+Por tanto, algunas expresiones posibles de consultas podemos listarlas como sigue:
+  
+  ```python
+  # Consulta de todos los elementos
+  venues = db.session.query(Venue).all()
+  # Consulta filtrando por un término
+  venues = db.session.query(Venue).filter(Venue.city == 'San Francisco').all()
+  # Consulta filtrando por un término y ordenando
+  venues = db.session.query(Venue).filter(Venue.city == 'San Francisco').order_by(Venue.name).all()
+  # Consulta filtrando por un término y ordenando de forma descendente
+  venues = db.session.query(Venue).filter(Venue.city == 'San Francisco').order_by(desc(Venue.name)).all()
+  # Consulta filtrando por un término y paginando
+  venues = db.session.query(Venue).filter(Venue.city == 'San Francisco').paginate(page, per_page, False)
+  # Consulta filtrando por un término y paginando con un ordenamiento
+  venues = db.session.query(Venue).filter(Venue.city == 'San Francisco').order_by(desc(Venue.name)).paginate(page, per_page, False)
+  # Consultas usando distinct
+  venues = db.session.query(Venue).distinct(Venue.city).all()
+  # Consultas usando join
+  venues = db.session.query(Venue).join(Artist).all()
+  # Consultas usando join y filtrando
+  venues = db.session.query(Venue).join(Artist).filter(Artist.city == 'San Francisco').all()
+  # Consultas usando join y filtrando y ordenando
+  venues = db.session.query(Venue).join(Artist).filter(Artist.city == 'San Francisco').order_by(desc(Artist.name)).all()
+  # Consultas usando join y filtrando y ordenando y paginando
+  venues = db.session.query(Venue).join(Artist).filter(Artist.city == 'San Francisco').order_by(desc(Artist.name)).paginate(page, per_page, False)
+  # Consultas usando subquery
+  venues = db.session.query(Venue).filter(Venue.city.in_(db.session.query(Artist.city).filter(Artist.city == 'San Francisco'))).all()
+  # Consultas usando subquery y filtrando
+  venues = db.session.query(Venue).filter(Venue.city.in_(db.session.query(Artist.city).filter(Artist.city == 'San Francisco'))).filter(Venue.name == 'The Musical Hop').all()
+  # Consultas usando subquery y filtrando y ordenando
+  venues = db.session.query(Venue).filter(Venue.city.in_(db.session.query(Artist.city).filter(Artist.city == 'San Francisco'))).filter(Venue.name == 'The Musical Hop').order_by(desc(Venue.name)).all()
+  # Consultas usando subquery y filtrando y ordenando y paginando
+  venues = db.session.query(Venue).filter(Venue.city.in_(db.session.query(Artist.city).filter(Artist.city == 'San Francisco'))).filter(Venue.name == 'The Musical Hop').order_by(desc(Venue.name)).paginate(page, per_page, False)
+  # Consulta para contar
+  venues = db.session.query(Venue).count()
+  # Consulta para mostrar una cantidad especifica de resultados
+  venues = db.session.query(Venue).limit(10).all()
+  venues = db.session.query(Venue).get(10)
+  # Consultas usando ilike
+  venues = db.session.query(Venue).filter(Venue.name.ilike('%musical%')).all()
+  # Consultas usando like
+  venues = db.session.query(Venue).filter(Venue.name.like('%musical%')).all()
+  ```
+
+Significado de las palabras claves de las consultas:
+- `filter`: Filtra los datos de la tabla según el término que se le pase.
+- `order_by`: Ordena los datos de la tabla según el término que se le pase.
+- `desc`: Ordena los datos de forma descendente.
+- `paginate`: Pagina los datos de la tabla según el número de página y la cantidad de elementos por página que se le pase.
+- `distinct`: Filtra los datos de la tabla según el término que se le pase.
+- `join`: Realiza un join entre dos tablas.
+- `in_`: Filtra los datos de la tabla según el término que se le pase.
+- `subquery`: Realiza una subconsulta.
+- `all()`: Devuelve todos los resultados de la consulta.
+- `first()`: Devuelve el primer resultado de la consulta.
+- `one()`: Devuelve un solo resultado de la consulta.
+- `one_or_none()`: Devuelve un solo resultado de la consulta o None si no hay resultados.
+- `scalar()`: Devuelve un solo resultado de la consulta o None si no hay resultados.
+- `count()`: Devuelve el número de resultados de la consulta.
+- `delete()`: Elimina los resultados de la consulta.
+- `update()`: Actualiza los resultados de la consulta.
+- `add()`: Agrega un nuevo elemento a la consulta.
+- `get()`: Devuelve un solo resultado de la consulta.
+- `get_or_404()`: Devuelve un solo resultado de la consulta o un error 404 si no hay resultados.
+- `limit()`: Limita el número de resultados de la consulta.
+- `ilike()`: Filtra los datos de la tabla según el término que se le pase de forma insensible a mayúsculas y minúsculas.
+- `like()`: Filtra los datos de la tabla según el término que se le pase.
+
+
+
+
+
+
+
