@@ -251,6 +251,10 @@ Por tanto, algunas expresiones posibles de consultas podemos listarlas como sigu
   venues = db.session.query(Venue).filter(Venue.name.ilike('%musical%')).all()
   # Consultas usando like
   venues = db.session.query(Venue).filter(Venue.name.like('%musical%')).all()
+  # Consultas usando not
+  venues = db.session.query(Venue).filter(not_(Venue.name == 'The Musical Hop')).all()
+  # Consultas usando lambda
+  venues = db.session.query(Venue).filter(lambda: Venue.name == 'The Musical Hop').all()
   ```
 
 Significado de las palabras claves de las consultas:
@@ -276,10 +280,47 @@ Significado de las palabras claves de las consultas:
 - `limit()`: Limita el número de resultados de la consulta.
 - `ilike()`: Filtra los datos de la tabla según el término que se le pase de forma insensible a mayúsculas y minúsculas.
 - `like()`: Filtra los datos de la tabla según el término que se le pase.
+- `not_`: Filtra los datos de la tabla según el término que se le pase.
+- `lambda`: Filtra los datos de la tabla según el término que se le pase.
 
 
+Uso de lambda:
+```python
+venues = db.session.query(Venue).filter(lambda: Venue.name == 'The Musical Hop').all()
+```
+En este ejemplo, la función lambda se utiliza para filtrar los datos de la tabla Venue según el
+nombre del lugar sea igual a 'The Musical Hop'.
+
+Cómo se usa lambda en las query de flask-sqlachemy?
+
+```python
+venues = db.session.query(Venue).filter(lambda: Venue.name == 'The Musical Hop').all()
+```
+En este ejemplo, la función lambda se utiliza para filtrar los datos de la tabla Venue según el
+nombre del lugar sea igual a 'The Musical Hop'.
 
 
+Solucionando problema:
 
+Al colectar los datos del formulario de los genders (genéros), usamos el método getlist() que guarda las opciones en la base de datos de la siguiente forma:
 
+```
+{Blues,Electronic,Jazz,Pop} 
+```
 
+Al recuperar estos datos para presentarlos por el frontend, si los imprimimos por pantalla se ven:
+
+```
+['{', 'C', 'l', 'a', 's', 's', 'i', 'c', 'a', 'l', ',', 'F', 'o', 'l', 'k', ',', 'J', 'a', 'z', 'z', ',', '"', 'R', 'o', 'c', 'k', ' ', 'n', ' ', 'R', 'o', 'l', 'l', '"', '}']
+```
+
+Es decir, la lista se muestra como una lista de caracteres (lo que en otros lenguajes llamaríamos char, pero python no tiene ese tipo de dato y lo trata como string).
+
+Al llevar este dato a la plantilla, cuando se renderiza esta, muestra los caracteres impresos por separado, y por tanto, a nivel de estilo de la plantilla podemos ver que cada caracter por separado toma el estilo diseñado para abarcar la palabra completa del 'genero musical' de este proyecto.
+
+Para resolver lo anterior, usamos algunos métodos de manejos de string:
+- `join()`: Unimos todos los elementos de la lista en una cadena.
+- `strip('{}')`: Eliminamos los carácteres innecesarios como los parentesis de llave.
+- `split(',')`: Finalmente, dividimos la cadena de string creada en una lista de strings. Para ello separamos los elementos mediante la coma que los unía.
+
+Ahora, se visualizan correctamente los generos con sus respectivos estilos en la plantilla correspondiente.
