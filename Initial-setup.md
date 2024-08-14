@@ -333,3 +333,29 @@ Como el formulario no permite peticiones del tipo 'DELETE', hubo que modificar e
 Por otra parte, al formulario le proporcionamos mediante el input del tipo submit la acción de url_for, la cual tiene por primer parámetro el nombre de la función del endpoint al que se dirige la petición (Podría haber más de una función por la cual se acceda con el endpoint'venues/<id_venue>' y el método post), y como segundo parámetro se envía la id del elemento a eliminar.
 
 En la función 'delete_venue()' se recibe la id del elemento a eliminar, se busca en la base de datos y se elimina. Finalmente, se redirige a la página de inicio.
+
+### Flask-WTF
+
+Flask-WTF es una extensión de Flask que proporciona una integración con WTForms, una biblioteca de formularios en Python.
+
+Considerar que el valor de un checkbox es booleano, no obstante, los valores arrojados por el Flask-Wtf son:
+- 'y': Si el checkbox está seleccionado.
+- None: Si el checkbox no está seleccionado.
+
+Para solucionar lo anterior, se puede usar el método `getlist()` que devuelve una lista con los valores de los checkbox, en caso de valores múltiples.
+
+En nuestro caso creamos una validación para asignar un valor booleano, más conveniente para guardarlo en la base de datos para manipulaciones posteriores:
+
+  ```python
+    seeking_venue = True if request.form.get('seeking_venue') else False
+    # o
+    seeking_venue = True if seeking_venue == 'y' else False
+  ```
+Otra alternativa sería:
+
+```python
+  if seeking_venue == 'y':
+    seeking_venue = True
+  else:
+    seeking_venue = False
+```
