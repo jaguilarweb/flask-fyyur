@@ -252,3 +252,14 @@
     "upcoming_shows_count": 3,
   }
   ```
+
+  ```data=[{
+         "id": 4,
+         "name": "Guns N Petals",
+       }, {
+         "id": 5,
+         "name": "Matt Quevedo",
+       }, {
+         "id": 6,
+         "name": "The Wild Sax Band",
+       }]```
