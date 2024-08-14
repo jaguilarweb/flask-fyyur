@@ -13,6 +13,20 @@
 				</div>
 			</a>
 		</li>
+		<li>
+			<form>
+				<div class="item">
+					<i class="fas fa-trash-alt"></i>
+					<input 	type="submit"
+									value="Delete"
+									class="btn btn-danger"
+									formmethod="post"
+									formaction="{{
+										url_for('delete_venue', venue_id=venue.id)
+									}}">
+				</div>
+			</form>
+		</li>
 		{% endfor %}
 	</ul>
 {% endfor %}

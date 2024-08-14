@@ -324,3 +324,12 @@ Para resolver lo anterior, usamos algunos métodos de manejos de string:
 - `split(',')`: Finalmente, dividimos la cadena de string creada en una lista de strings. Para ello separamos los elementos mediante la coma que los unía.
 
 Ahora, se visualizan correctamente los generos con sus respectivos estilos en la plantilla correspondiente.
+
+### Eliminar Venues
+
+Para eliminar un venue, se crea un botón en la plantilla 'venues.html'.
+Como el formulario no permite peticiones del tipo 'DELETE', hubo que modificar el endpoint para pasarlo de metodo 'DELETE' a 'POST'.
+
+Por otra parte, al formulario le proporcionamos mediante el input del tipo submit la acción de url_for, la cual tiene por primer parámetro el nombre de la función del endpoint al que se dirige la petición (Podría haber más de una función por la cual se acceda con el endpoint'venues/<id_venue>' y el método post), y como segundo parámetro se envía la id del elemento a eliminar.
+
+En la función 'delete_venue()' se recibe la id del elemento a eliminar, se busca en la base de datos y se elimina. Finalmente, se redirige a la página de inicio.
