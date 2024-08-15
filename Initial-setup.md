@@ -359,3 +359,6 @@ Otra alternativa sería:
   else:
     seeking_venue = False
 ```
+
+
+//TODO: Revisar los métodos update

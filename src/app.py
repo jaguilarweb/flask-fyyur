@@ -358,22 +358,46 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
-    error=False
+  error=False
+  name = request.form.get('name')
+  city = request.form.get('city')
+  state = request.form.get('state')
+  address = request.form.get('address')
+  phone = request.form.get('phone')
+  image_link = request.form.get('image_link')
+  genres= request.form.getlist('genres')
+  facebook_link = request.form.get('facebook_link')
+  website_link = request.form.get('website_link')
+  seeking_talent = True if request.form.get('seeking_talent') else False
+  seeking_description = request.form.get('seeking_description')
+  print(genres)
+  
+  try:
+    venue = db.get_or_404(Venue, venue_id)
+    venue.name = name
+    venue.city = city
+    venue.state = state
+    venue.address = address
+    venue.phone = phone
+    venue.image_link = image_link
+    venue.genres = genres
+    venue.facebook_link = facebook_link
+    venue.website_link = website_link
+    venue.seeking_talent = seeking_talent
+    venue.seeking_description = seeking_description
+    db.session.commit()
+  except():
+    error = True
+    db.session.rollback()
+  finally:
+    db.session.close()
+  if error:
+    flash('An error occurred. Venue ' + name + ' could not be displayed.')
+    print(sys.exc_info())
+  else:
+    flash('Venue ' + name + ' was successfully listed!')
 
-    try:
-      venue = db.get_or_404(Venue, venue_id)
-    except():
-      error = True
-      db.session.rollback()
-    finally:
-      db.session.close()
-    if error:
-      flash('An error occurred. Venue ' + venue.name + ' could not be displayed.')
-      print(sys.exc_info())
-    else:
-      flash('Venue ' + venue.name + ' was successfully listed!')
-
-    return redirect(url_for('show_venue', venue_id=venue_id))
+  return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Delete Venue
 #  ----------------------------------------------------------------
