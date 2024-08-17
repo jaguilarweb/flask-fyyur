@@ -112,14 +112,16 @@ def venues():
   # (Check) TODO: replace with real venues data.
   #      TODO: num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
   error = False
-  num_upcoming_shows = 0
+  upcoming_shows_count=0
   data=[]
 
   try:
-    # Venues by city
-    areas=db.session.query(Venue).distinct(Venue.city).all()
+    # City list from venues not duplicated
+    areas=db.session.query(Venue.city, Venue.state).distinct(Venue.city).all()
     # All venues
     venues=db.session.query(Venue).all()
+    # Count shows by upcomming dated
+    upcoming_shows_count=db.session.query(Show).filter(Show.start_time > datetime.now()).count()
   except():
     error = True
     db.session.rollback()
@@ -139,7 +141,7 @@ def venues():
           {
             "id": venue.id,
             "name": venue.name,
-            "num_upcoming_shows": num_upcoming_shows
+            "num_upcoming_shows": upcoming_shows_count
           } for venue in venues if venue.city == area.city
         ]
       })
@@ -171,6 +173,8 @@ def show_venue(venue_id):
 
   try:
     venue = db.get_or_404(Venue, venue_id)
+    past_shows = db.session.query(Show.venue_id, Show.start_time, Artist.id, Artist.name, Artist.image_link).join(Venue).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time < datetime.now()).all()
+    upcoming_shows = db.session.query(Show.venue_id, Show.start_time, Artist.id, Artist.name, Artist.image_link).join(Venue).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time >= datetime.now()).all()
   except():
     error = True
     db.session.rollback()
@@ -198,71 +202,26 @@ def show_venue(venue_id):
       "seeking_talent": venue.seeking_talent,
       "seeking_description": venue.seeking_description,
       "image_link": venue.image_link,
-      "past_shows": [{
-        "artist_id": 4,
-        "artist_name": "Guns N Petals",
-        "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-        "start_time": "2019-05-21T21:30:00.000Z"
-      }],
-      "upcoming_shows": [],
-      "past_shows_count": 1,
-      "upcoming_shows_count": 0,
+      "past_shows": [
+        {
+        "artist_id": show.id,
+        "artist_name": show.name,
+        "artist_image_link": show.image_link,
+        "start_time": str(show.start_time)
+      }for show in past_shows
+      ],
+      "upcoming_shows": [
+        {
+          "artist_id": show.id,
+          "artist_name": show.name,
+          "artist_image_link": show.image_link,
+          "start_time": str(show.start_time)
+        }for show in upcoming_shows
+      ],
+      "past_shows_count": len(past_shows),
+      "upcoming_shows_count": len(upcoming_shows),
     }
-  """   data2={
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "genres": ["Classical", "R&B", "Hip-Hop"],
-      "address": "335 Delancey Street",
-      "city": "New York",
-      "state": "NY",
-      "phone": "914-003-1132",
-      "website": "https://www.theduelingpianos.com",
-      "facebook_link": "https://www.facebook.com/theduelingpianos",
-      "seeking_talent": False,
-      "image_link": "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-      "past_shows": [],
-      "upcoming_shows": [],
-      "past_shows_count": 0,
-      "upcoming_shows_count": 0,
-    }
-    data3={
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "genres": ["Rock n Roll", "Jazz", "Classical", "Folk"],
-      "address": "34 Whiskey Moore Ave",
-      "city": "San Francisco",
-      "state": "CA",
-      "phone": "415-000-1234",
-      "website": "https://www.parksquarelivemusicandcoffee.com",
-      "facebook_link": "https://www.facebook.com/ParkSquareLiveMusicAndCoffee",
-      "seeking_talent": False,
-      "image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-      "past_shows": [{
-        "artist_id": 5,
-        "artist_name": "Matt Quevedo",
-        "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-        "start_time": "2019-06-15T23:00:00.000Z"
-      }],
-      "upcoming_shows": [{
-        "artist_id": 6,
-        "artist_name": "The Wild Sax Band",
-        "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-        "start_time": "2035-04-01T20:00:00.000Z"
-      }, {
-        "artist_id": 6,
-        "artist_name": "The Wild Sax Band",
-        "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-        "start_time": "2035-04-08T20:00:00.000Z"
-      }, {
-        "artist_id": 6,
-        "artist_name": "The Wild Sax Band",
-        "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-        "start_time": "2035-04-15T20:00:00.000Z"
-      }],
-      "past_shows_count": 1,
-      "upcoming_shows_count": 1,
-    }
-    data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0] """
+
   return render_template('pages/show_venue.html', venue=data)
 
 
@@ -473,6 +432,8 @@ def show_artist(artist_id):
 
   try:
     artist = db.get_or_404(Artist, artist_id)
+    past_shows = db.session.query(Show.artist_id, Show.start_time, Venue.id, Venue.name, Venue.image_link).join(Venue).join(Artist).filter(Show.artist_id==artist_id).filter(Show.start_time < datetime.now()).all()
+    upcoming_shows = db.session.query(Show.artist_id, Show.start_time, Venue.id, Venue.name, Venue.image_link).join(Venue).join(Artist).filter(Show.artist_id==artist_id).filter(Show.start_time >= datetime.now()).all()
   except():
     error: True
     db.session.rollback()
@@ -497,15 +458,24 @@ def show_artist(artist_id):
       "seeking_venue":artist.seeking_venue,
       "seeking_description": artist.seeking_description,
       "image_link": artist.image_link,
-      "past_shows": [{
-        "venue_id": 1,
-        "venue_name": "The Musical Hop",
-        "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-        "start_time": "2019-05-21T21:30:00.000Z"
-      }],
-      "upcoming_shows": [],
-      "past_shows_count": 1,
-      "upcoming_shows_count": 0,
+      "past_shows": [
+        {
+          "venue_id": show.id,
+          "venue_name": show.name,
+          "venue_image_link": show.image_link,
+          "start_time": str(show.start_time)
+        }for show in past_shows
+      ],
+      "upcoming_shows": [
+        {
+          "venue_id": show.id,
+          "venue_name": show.name,
+          "venue_image_link": show.image_link,
+          "start_time": str(show.start_time)
+        }for show in upcoming_shows
+      ],
+      "past_shows_count": len(past_shows),
+      "upcoming_shows_count": len(upcoming_shows),
     }
 
       return render_template('pages/show_artist.html', artist=data)
@@ -533,7 +503,6 @@ def edit_artist(artist_id):
     
 # (Check) TODO: Que se muestren la lista de genres marcadas en el form.control de opciones 
     genres = "".join(artist.genres).strip('{}')
-    print(genres)
     form.name.data = artist.name
     form.city.data = artist.city
     form.state.data = artist.state
@@ -564,7 +533,6 @@ def edit_artist_submission(artist_id):
   website_link = request.form.get('website_link')
   seeking_venue = True if request.form.get('seeking_venue') else False
   seeking_description = request.form.get('seeking_description')
-  print(genres)
   try:
     artist = db.get_or_404(Artist, artist_id)
     artist.name = name
@@ -691,10 +659,8 @@ def shows():
       "artist_id": show.Artist.id,
       "artist_name": show.Artist.name,
       "artist_image_link": show.Artist.image_link,
-      "start_time": show.Show.start_time.strftime('%Y-%m-%d %H:%I')
+      "start_time": str(show.Show.start_time)
     })
-
-# str(show.Show.start_time) // Alternetive
 
   return render_template('pages/shows.html', shows=data)
 
