@@ -154,14 +154,35 @@ def search_venues():
   # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+  error = False
+  response = {}
+  try:
+    search_by_name = db.session.query(Venue).filter(Venue.name.ilike('%' + request.form.get('search_term', '') + '%')).all()
+    search_by_city = db.session.query(Venue).filter(Venue.city.ilike('%' + request.form.get('search_term', '') + '%')).all()
+    search_by_state = db.session.query(Venue).filter(Venue.state.ilike('%' + request.form.get('search_term', '') + '%')).all()
+    search = search_by_name + search_by_city + search_by_state
+
+  except():
+    error = True
+    db.session.rollback()
+  finally:
+    db.session.close()
+  if error:
+    flash('An error occurred. Venues could not be listed.')
+    print(sys.exc_info())
+  else:
+    flash('Venues has been successfully listed!')
+
   response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
+    "count": len(search),
+    "data": [
+      {
+      "id": venue.id,
+      "name": venue.name,
+      }for venue in search
+    ]
   }
+
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 
@@ -413,13 +434,32 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
+  error = False
+  response={}
+  try:
+    search_by_name = db.session.query(Artist).filter(Artist.name.ilike('%' + request.form.get('search_term', '') + '%')).all()
+    search_by_city = db.session.query(Artist).filter(Artist.city.ilike('%' + request.form.get('search_term', '') + '%')).all()
+    search_by_state = db.session.query(Artist).filter(Artist.state.ilike('%' + request.form.get('search_term', '') + '%')).all()
+    search = search_by_name + search_by_city + search_by_state
+  except():
+    error = True
+    db.session.rollback()
+  finally:
+    db.session.close()
+  if error:
+    flash('An error occurred. Artists could not be listed.')
+    print(sys.exc_info())
+  else:
+    flash('Artists has been successfully listed!')
+
   response={
     "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
+    "data": [
+      {
+        "id": artist.id,
+        "name": artist.name,
+      } for artist in search
+    ]
   }
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
